@@ -8,6 +8,8 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
 
   const fetchDevices = async () => {
     setLoading(true);
@@ -27,22 +29,31 @@ function App() {
   }, []);
 
   const handleAdd = async (device) => {
+    setSubmitting(true);
     try {
       await addDevice(device);
       setSuccessMsg('✅ Cihaz başarıyla eklendi!');
-      fetchDevices();
+      await fetchDevices();
       setTimeout(() => setSuccessMsg(''), 3000);
     } catch (err) {
       setErrorMsg('Cihaz eklenemedi.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const handleDelete = async (id) => {
+    const confirmed = window.confirm('Bu kaydı silmek istediğinize emin misiniz?');
+    if (!confirmed) return;
+
+    setDeletingId(id);
     try {
       await deleteDevice(id);
-      fetchDevices();
+      await fetchDevices();
     } catch (err) {
       setErrorMsg('Silme işlemi başarısız oldu.');
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -55,8 +66,8 @@ function App() {
       {errorMsg && <p style={{ color: 'red' }}>{errorMsg}</p>}
       {successMsg && <p style={{ color: 'green' }}>{successMsg}</p>}
 
-      <DeviceForm onAdd={handleAdd} />
-      <DeviceList devices={devices} onDelete={handleDelete} loading={loading} />
+      <DeviceForm onAdd={handleAdd} submitting={submitting} />
+      <DeviceList devices={devices} onDelete={handleDelete} loading={loading} deletingId={deletingId} />
     </div>
   );
 }

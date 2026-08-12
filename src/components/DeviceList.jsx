@@ -1,4 +1,4 @@
-function DeviceList({ devices, onDelete, loading }) {
+function DeviceList({ devices, onDelete, loading, deletingId }) {
   if (loading) {
     return <p>Yükleniyor... (Backend uykuda olabilir, ilk istek ~1 dakika sürebilir)</p>;
   }
@@ -28,7 +28,12 @@ function DeviceList({ devices, onDelete, loading }) {
               <td>{device.value}</td>
               <td>{new Date(device.createdAt).toLocaleString('tr-TR')}</td>
               <td>
-                <button onClick={() => onDelete(device.id)}>Sil</button>
+                <button
+                  onClick={() => onDelete(device.id)}
+                  disabled={deletingId === device.id}
+                >
+                  {deletingId === device.id ? 'Siliniyor...' : 'Sil'}
+                </button>
               </td>
             </tr>
           ))}
