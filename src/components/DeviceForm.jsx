@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-function DeviceForm({ onAdd }) {
+function DeviceForm({ onAdd, submitting }) {
   const [name, setName] = useState('');
   const [location, setLocation] = useState('');
   const [value, setValue] = useState('');
@@ -33,6 +33,7 @@ function DeviceForm({ onAdd }) {
         value={name}
         onChange={(e) => setName(e.target.value)}
         required
+        disabled={submitting}
       />
       <input
         type="text"
@@ -40,6 +41,7 @@ function DeviceForm({ onAdd }) {
         value={location}
         onChange={(e) => setLocation(e.target.value)}
         required
+        disabled={submitting}
       />
       <input
         type="number"
@@ -47,8 +49,11 @@ function DeviceForm({ onAdd }) {
         value={value}
         onChange={(e) => setValue(e.target.value)}
         required
+        disabled={submitting}
       />
-      <button type="submit">Ekle</button>
+      <button type="submit" disabled={submitting}>
+        {submitting ? 'Ekleniyor...' : 'Ekle'}
+      </button>
     </form>
   );
 }
