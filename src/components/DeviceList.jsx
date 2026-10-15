@@ -1,44 +1,64 @@
+import Spinner from './Spinner';
+import StatusBadge from './StatusBadge';
+
+const formatDate = (value) => {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? '-' : date.toLocaleString('tr-TR');
+};
+
 function DeviceList({ devices, onDelete, loading, deletingId }) {
   if (loading) {
-    return <p>Yükleniyor... (Backend uykuda olabilir, ilk istek ~1 dakika sürebilir)</p>;
+    return (
+      <div className="card center">
+        <Spinner label="Yükleniyor... (Backend uykudaysa ilk istek ~1 dakika sürebilir)" />
+      </div>
+    );
   }
 
   if (devices.length === 0) {
-    return <p>Henüz kayıt yok.</p>;
+    return <div className="card center muted">Henüz kayıt yok.</div>;
   }
 
   return (
-    <div>
-      <h2>Cihaz Okumaları</h2>
-      <table border="1" cellPadding="8">
-        <thead>
-          <tr>
-            <th>Ad</th>
-            <th>Konum</th>
-            <th>Değer</th>
-            <th>Tarih</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {devices.map((device) => (
-            <tr key={device.id}>
-              <td>{device.name}</td>
-              <td>{device.location}</td>
-              <td>{device.value}</td>
-              <td>{new Date(device.createdAt).toLocaleString('tr-TR')}</td>
-              <td>
-                <button
-                  onClick={() => onDelete(device.id)}
-                  disabled={deletingId === device.id}
-                >
-                  {deletingId === device.id ? 'Siliniyor...' : 'Sil'}
-                </button>
-              </td>
+    <div className="card">
+      <h2>Cihaz Okumaları ({devices.length})</h2>
+      <div className="table-scroll">
+        <table className="device-table">
+          <thead>
+            <tr>
+              <th>Ad</th>
+              <th>Kategori</th>
+              <th>Durum</th>
+              <th className="num">Değer</th>
+              <th>Son Güncelleme</th>
+              <th aria-label="İşlemler" />
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {devices.map((device) => (
+              <tr key={device.id}>
+                <td>{device.name}</td>
+                <td>{device.category}</td>
+                <td>
+                  <StatusBadge status={device.status} />
+                </td>
+                <td className="num">{device.value}</td>
+                <td>{formatDate(device.lastUpdated)}</td>
+                <td>
+                  <button
+                    type="button"
+                    className="btn btn-danger"
+                    onClick={() => onDelete(device.id)}
+                    disabled={deletingId === device.id}
+                  >
+                    {deletingId === device.id ? <Spinner size="sm" label="Siliniyor..." /> : 'Sil'}
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
